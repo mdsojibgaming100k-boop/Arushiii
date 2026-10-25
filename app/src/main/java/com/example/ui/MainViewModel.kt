@@ -64,7 +64,11 @@ data class MainUiState(
     val showAdminDialog: Boolean = false,
     val showSubscriptionDialog: Boolean = false,
     val isVoiceActive: Boolean = false,
-    val voiceStatusText: String = "আরুষির সাথে কথা বলুন"
+    val voiceStatusText: String = "আরুষির সাথে কথা বলুন",
+    val isBackgroundServiceRunning: Boolean = false,
+    val wakeWordEnabled: Boolean = true,
+    val wakeSensitivity: com.example.service.WakeSensitivity = com.example.service.WakeSensitivity.MEDIUM,
+    val isBatteryOptimizationIgnored: Boolean = false
 )
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -176,6 +180,76 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             liveService.toolCallFlow.collect { toolCall ->
                 handleToolCall(toolCall)
+            }
+        }
+
+        // Listen to VoiceAssistantForegroundService state
+        viewModelScope.launch {
+            com.example.service.VoiceAssistantForegroundService.isRunning.collect { running ->
+                _uiState.value = _uiState.value.copy(isBackgroundServiceRunning = running)
+            }
+        }
+
+        viewModelScope.launch {
+            com.example.service.VoiceAssistantForegroundService.statusText.collect { status ->
+                if (_uiState.value.isBackgroundServiceRunning) {
+                    _uiState.value = _uiState.value.copy(voiceStatusText = status)
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            com.example.service.VoiceAssistantForegroundService.amplitude.collect { amp ->
+                if (_uiState.value.isBackgroundServiceRunning) {
+                    _uiState.value = _uiState.value.copy(amplitude = amp)
+                }
+            }
+        }
+
+        checkBatteryOptimization()
+    }
+
+    fun checkBatteryOptimization() {
+        try {
+            val pm = getApplication<Application>().getSystemService(android.content.Context.POWER_SERVICE) as? android.os.PowerManager
+            val isIgnored = pm?.isIgnoringBatteryOptimizations(getApplication<Application>().packageName) ?: false
+            _uiState.value = _uiState.value.copy(isBatteryOptimizationIgnored = isIgnored)
+        } catch (e: Exception) {
+            // Ignored safely
+        }
+    }
+
+    fun toggleBackgroundService(enable: Boolean) {
+        val app = getApplication<Application>()
+        if (enable) {
+            com.example.service.VoiceAssistantForegroundService.startService(app)
+            addLog("System", "সবসময় ব্যাকগ্রাউন্ডে সচল মোড চালু হয়েছে। স্ক্রিন অফ থাকলেও 'হে আরুষি' বা 'Hey Sojib' শুনবে।")
+        } else {
+            com.example.service.VoiceAssistantForegroundService.stopService(app)
+            addLog("System", "ব্যাকগ্রাউন্ড মোড বন্ধ করা হয়েছে।")
+        }
+    }
+
+    fun setWakeSensitivity(level: com.example.service.WakeSensitivity) {
+        _uiState.value = _uiState.value.copy(wakeSensitivity = level)
+        addLog("System", "ওয়েক-ওয়ার্ড সংবেদনশীলতা সেট করা হয়েছে: ${level.label}")
+    }
+
+    fun openBatterySettings(context: android.content.Context) {
+        try {
+            val intent = android.content.Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                data = android.net.Uri.parse("package:${context.packageName}")
+                addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            try {
+                val intent = android.content.Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS).apply {
+                    addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                context.startActivity(intent)
+            } catch (ex: Exception) {
+                addLog("System", "ব্যাটারি অপ্টিমাইজেশন সেটিংস ওপেন করা যায়নি: ${ex.message}")
             }
         }
     }

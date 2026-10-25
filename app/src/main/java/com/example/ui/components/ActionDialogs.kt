@@ -188,8 +188,12 @@ fun MultipleContactsModal(
 fun SettingsModal(
     currentApiKey: String,
     isDirectCallEnabled: Boolean,
+    isBackgroundServiceRunning: Boolean = false,
+    isBatteryIgnored: Boolean = false,
     onSaveApiKey: (String) -> Unit,
     onToggleDirectCall: (Boolean) -> Unit,
+    onToggleBackgroundService: (Boolean) -> Unit = {},
+    onOpenBatterySettings: () -> Unit = {},
     onDismiss: () -> Unit
 ) {
     var keyInput by remember { mutableStateOf(currentApiKey) }
@@ -270,6 +274,55 @@ fun SettingsModal(
                     )
                 }
 
+                Spacer(modifier = Modifier.height(14.dp))
+
+                // Background Service Toggle
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "অলওয়েজ-অন ব্যাকগ্রাউন্ড মোড",
+                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                            color = Color(0xFF0F172A)
+                        )
+                        Text(
+                            text = "স্ক্রিন অফ বা অ্যাপ মিনিমাইজ থাকলেও শুনবে",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color(0xFF64748B)
+                        )
+                    }
+
+                    Switch(
+                        checked = isBackgroundServiceRunning,
+                        onCheckedChange = onToggleBackgroundService,
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = Color(0xFFD97706)
+                        )
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Battery Optimization Exemption
+                Button(
+                    onClick = onOpenBatterySettings,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isBatteryIgnored) Color(0xFF10B981) else Color(0xFFF59E0B)
+                    ),
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = if (isBatteryIgnored) "✓ ব্যাটারি অপ্টিমাইজেশন মুক্ত (Whitelisted)" else "⚡ ব্যাটারি অপ্টিমাইজেশন বন্ধ করুন (Ignore Battery Saver)",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Card(
@@ -279,12 +332,12 @@ fun SettingsModal(
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
                         Text(
-                            text = "SOJIB AI — বাংলাদেশি হিউম্যান ভয়েস ইঞ্জিন",
+                            text = "SOJIB AI — ব্যাকগ্রাউন্ড ও বহুভাষী ভয়েস ইঞ্জিন",
                             style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                             color = Color(0xFFC2410C)
                         )
                         Text(
-                            text = "• সহকারী: আরুষি (Arushi - Bangladeshi Girl)\n• ইঞ্জিন: Gemini 2.0 Live Realtime Multimodal\n• ভাষা: মিষ্টি বাংলা, ইংলিশ, হিংলিশ স্বয়ংক্রিয় সনাক্তকরণ\n• অডিও: 16kHz PCM মাইক্রোফোন, 24kHz PCM ভয়েস",
+                            text = "• ওয়েক-ওয়ার্ড: 'Hey Arushi' / 'হে আরুষি', 'Hey Sojib'\n• বহুভাষী: বাংলা, English, हिन्दी (Hindi), Hinglish\n• অটো-ডিটেকশন: ভাষা পরিবর্তনের সাথে সাথে স্বয়ংক্রিয় স্যুইচিং\n• ব্যাকগ্রাউন্ড সার্ভিস: অ্যান্ড্রয়েড ফোরগ্রাউন্ড সার্ভিস ও পারশিয়াল ওয়েক-লক\n• অ্যাকশনস: হোয়াটসঅ্যাপ, ইউটিউব, কলিং, কন্টাক্টস, টর্চ",
                             style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
                             color = Color(0xFF475569)
                         )

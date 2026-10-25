@@ -10,6 +10,12 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <!-- Queries to allow launching installed apps via intents -->
     <queries>
@@ -58,6 +64,12 @@
                 <data android:scheme="sojibai" />
             </intent-filter>
         </activity>
+
+        <!-- Foreground Service for Always-On Background Voice & Wake-Word Listening -->
+        <service
+            android:name=".service.VoiceAssistantForegroundService"
+            android:foregroundServiceType="microphone"
+            android:exported="false" />
     </application>
 
 </manifest>

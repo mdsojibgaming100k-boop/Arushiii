@@ -117,18 +117,21 @@ fun SojibAiApp(viewModel: MainViewModel = viewModel()) {
 
     // Check permissions on start
     fun requestPermissionsAndConnect() {
-        val hasMic = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
-        val hasContacts = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
-        val hasCall = ContextCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED
+        val permissionsList = mutableListOf(
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.READ_CONTACTS,
+            Manifest.permission.CALL_PHONE
+        )
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            permissionsList.add(Manifest.permission.POST_NOTIFICATIONS)
+        }
 
-        if (!hasMic || !hasContacts || !hasCall) {
-            permissionsLauncher.launch(
-                arrayOf(
-                    Manifest.permission.RECORD_AUDIO,
-                    Manifest.permission.READ_CONTACTS,
-                    Manifest.permission.CALL_PHONE
-                )
-            )
+        val missing = permissionsList.filter {
+            ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
+        }
+
+        if (missing.isNotEmpty()) {
+            permissionsLauncher.launch(permissionsList.toTypedArray())
         } else {
             viewModel.connectLiveSession()
         }
@@ -234,6 +237,40 @@ fun SojibAiApp(viewModel: MainViewModel = viewModel()) {
                 .background(CreamBackground),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Background Assistant Indicator & Toggle Pill
+            Surface(
+                shape = RoundedCornerShape(20.dp),
+                color = if (uiState.isBackgroundServiceRunning) Color(0xFFECFDF5) else Color(0xFFF8FAFC),
+                border = androidx.compose.foundation.BorderStroke(
+                    1.dp,
+                    if (uiState.isBackgroundServiceRunning) Color(0xFF10B981) else Color(0xFFE2E8F0)
+                ),
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 4.dp)
+                    .clickable {
+                        viewModel.toggleBackgroundService(!uiState.isBackgroundServiceRunning)
+                    }
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                ) {
+                    androidx.compose.foundation.Canvas(modifier = Modifier.size(8.dp)) {
+                        drawCircle(color = if (uiState.isBackgroundServiceRunning) Color(0xFF10B981) else Color(0xFF94A3B8))
+                    }
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = if (uiState.isBackgroundServiceRunning)
+                            "অলওয়েজ-অন ব্যাকগ্রাউন্ড সক্রিয় • 'Hey Arushi' বা 'Hey Sojib' বলুন"
+                        else
+                            "ব্যাকগ্রাউন্ড মোড বন্ধ • ট্যাপ করে অন করুন",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = if (uiState.isBackgroundServiceRunning) Color(0xFF065F46) else Color(0xFF64748B)
+                    )
+                }
+            }
+
             // Animated Voice Orb Centerpiece in Cream Gold Theme
             VoiceOrbVisualizer(
                 state = uiState.liveState,
@@ -247,7 +284,7 @@ fun SojibAiApp(viewModel: MainViewModel = viewModel()) {
                         viewModel.disconnectLiveSession()
                     }
                 },
-                modifier = Modifier.padding(top = 4.dp)
+                modifier = Modifier.padding(top = 2.dp)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -413,8 +450,12 @@ fun SojibAiApp(viewModel: MainViewModel = viewModel()) {
         SettingsModal(
             currentApiKey = uiState.apiKey,
             isDirectCallEnabled = uiState.isDirectCallEnabled,
+            isBackgroundServiceRunning = uiState.isBackgroundServiceRunning,
+            isBatteryIgnored = uiState.isBatteryOptimizationIgnored,
             onSaveApiKey = { newKey -> viewModel.updateApiKey(newKey) },
             onToggleDirectCall = { enabled -> viewModel.toggleDirectCall(enabled) },
+            onToggleBackgroundService = { enabled -> viewModel.toggleBackgroundService(enabled) },
+            onOpenBatterySettings = { viewModel.openBatterySettings(context) },
             onDismiss = { showSettings = false }
         )
     }
