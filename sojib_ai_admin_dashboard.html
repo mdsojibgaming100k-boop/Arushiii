@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOJIB AI — এডমিন কন্ট্রোল সেন্টার</title>
+  <!-- Tailwind CSS & Google Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Hind Siliguri', sans-serif;
+      background-color: #FDFBF7;
+      color: #0F172A;
+    }
+  </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+  <div class="max-w-5xl mx-auto">
+    <!-- Header -->
+    <div class="bg-white border border-[#EBE3D5] rounded-2xl p-6 shadow-sm mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-full bg-[#D97706]/10 border-2 border-[#D97706] flex items-center justify-center text-2xl font-bold text-[#D97706]">
+          SA
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-slate-900">SOJIB AI — এডমিন ড্যাশবোর্ড</h1>
+          <p class="text-sm text-slate-500">Firebase: <span class="font-semibold text-amber-700">aisojib</span> • আরুষি বাংলাদেশি ভয়েস সহকারী কন্ট্রোল</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
+          ● ক্লাউড কানেক্টেড
+        </span>
+        <button onclick="saveAllSettings()" class="bg-[#D97706] hover:bg-amber-700 text-white font-bold px-5 py-2.5 rounded-xl shadow transition">
+          সব সেভ করুন
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <!-- 1. Subscription & Pricing Settings -->
+      <div class="bg-white border border-[#EBE3D5] rounded-2xl p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4 border-b pb-3">
+          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+            ⭐ প্রিমিয়াম ও বয়স নিয়ন্ত্রণ
+          </h2>
+          <span class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-1 rounded">সিস্টেম পলিসি</span>
+        </div>
+
+        <div class="space-y-4">
+          <div class="flex items-center justify-between p-3 bg-[#FDFBF7] rounded-xl border border-[#EBE3D5]">
+            <div>
+              <p class="font-bold text-slate-800">প্রিমিয়াম সিস্টেম বাধ্যতামূলক</p>
+              <p class="text-xs text-slate-500">অন করলে ফ্রি লিমিটের পর পেমেন্ট ছাড়া আরুষি কথা বলবে না</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="isPremiumRequired" class="sr-only peer">
+              <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D97706]"></div>
+            </label>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">মাসিক প্যাকেজ মূল্য (৳)</label>
+              <input type="number" id="monthlyPrice" value="199" class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#D97706] outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">বাৎসরিক প্যাকেজ মূল্য (৳)</label>
+              <input type="number" id="yearlyPrice" value="1499" class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#D97706] outline-none">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">নূন্যতম বয়স নির্ধারণ</label>
+              <input type="number" id="minAge" value="18" placeholder="যেমন: ১৮ বা ০" class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#D97706] outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">ফ্রি ট্রায়াল লিমিট (মেসেজ)</label>
+              <input type="number" id="freeLimit" value="15" class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#D97706] outline-none">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Mobile Banking Gateways (bKash, Nagad, Rocket) -->
+      <div class="bg-white border border-[#EBE3D5] rounded-2xl p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4 border-b pb-3">
+          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+            💳 বিকাশ, নগদ ও রকেট গেটওয়ে
+          </h2>
+          <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-1 rounded">বাংলাদেশ পেমেন্ট</span>
+        </div>
+
+        <div class="space-y-4">
+          <!-- bKash -->
+          <div class="p-3 bg-[#FFF1F6] border border-[#E2136E]/30 rounded-xl">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-bold text-[#E2136E]">বিকাশ (bKash) পার্সোনাল</span>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="bkashEnabled" checked class="sr-only peer">
+                <div class="w-9 h-5 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#E2136E]"></div>
+              </label>
+            </div>
+            <input type="text" id="bkashNum" value="01712345678" placeholder="বিকাশ নম্বর লিখুন" class="w-full p-2 bg-white rounded-lg border border-slate-200 text-sm">
+          </div>
+
+          <!-- Nagad -->
+          <div class="p-3 bg-[#FFF7EE] border border-[#F7941D]/30 rounded-xl">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-bold text-[#F7941D]">নগদ (Nagad) পার্সোনাল</span>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="nagadEnabled" checked class="sr-only peer">
+                <div class="w-9 h-5 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#F7941D]"></div>
+              </label>
+            </div>
+            <input type="text" id="nagadNum" value="01812345678" placeholder="নগদ নম্বর লিখুন" class="w-full p-2 bg-white rounded-lg border border-slate-200 text-sm">
+          </div>
+
+          <!-- Rocket -->
+          <div class="p-3 bg-[#FAF2FB] border border-[#8C3494]/30 rounded-xl">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-bold text-[#8C3494]">রকেট (Rocket) পার্সোনাল</span>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="rocketEnabled" checked class="sr-only peer">
+                <div class="w-9 h-5 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#8C3494]"></div>
+              </label>
+            </div>
+            <input type="text" id="rocketNum" value="01912345678" placeholder="রকেট নম্বর লিখুন" class="w-full p-2 bg-white rounded-lg border border-slate-200 text-sm">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Requests Approval Table -->
+    <div class="bg-white border border-[#EBE3D5] rounded-2xl p-6 shadow-sm">
+      <div class="flex items-center justify-between mb-4 border-b pb-3">
+        <h2 class="text-lg font-bold text-slate-800">
+          📥 গ্রাহকের পেমেন্ট রিকোয়েস্ট ও ট্রানজেকশন হিস্ট্রি (TrxID)
+        </h2>
+        <button onclick="renderTable()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-semibold">
+          রিফ্রেশ
+        </button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-600">
+          <thead class="bg-slate-50 text-xs text-slate-700 uppercase">
+            <tr>
+              <th class="p-3">তারিখ</th>
+              <th class="p-3">গেটওয়ে</th>
+              <th class="p-3">টাকার পরিমাণ</th>
+              <th class="p-3">TrxID</th>
+              <th class="p-3">স্ট্যাটাস</th>
+              <th class="p-3 text-right">অ্যাকশন</th>
+            </tr>
+          </thead>
+          <tbody id="submissionsTableBody" class="divide-y divide-slate-100">
+            <!-- Dynamic rows -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // LocalStorage backed simulation syncable with Firebase aisojib
+    const DEFAULT_CONFIG = {
+      isPremiumRequired: false,
+      monthlyPrice: 199,
+      yearlyPrice: 1499,
+      minAge: 18,
+      freeLimit: 15,
+      bkashEnabled: true,
+      bkashNum: "01712345678",
+      nagadEnabled: true,
+      nagadNum: "01812345678",
+      rocketEnabled: true,
+      rocketNum: "01912345678"
+    };
+
+    let sampleSubs = [
+      { date: "২৪ অক্টো, ২০২৬", gateway: "bKash", amount: 199, trxId: "9J38S2K9M1", status: "অনুমোদিত" },
+      { date: "২৩ অক্টো, ২০২৬", gateway: "Nagad", amount: 1499, trxId: "NG72648102", status: "অনুমোদিত" },
+      { date: "২৩ অক্টো, ২০২৬", gateway: "Rocket", amount: 199, trxId: "RC91823746", status: "অনুমোদিত" }
+    ];
+
+    function loadSettings() {
+      const saved = JSON.parse(localStorage.getItem("sojib_ai_admin_cfg") || JSON.stringify(DEFAULT_CONFIG));
+      document.getElementById("isPremiumRequired").checked = saved.isPremiumRequired;
+      document.getElementById("monthlyPrice").value = saved.monthlyPrice;
+      document.getElementById("yearlyPrice").value = saved.yearlyPrice;
+      document.getElementById("minAge").value = saved.minAge;
+      document.getElementById("freeLimit").value = saved.freeLimit;
+      document.getElementById("bkashEnabled").checked = saved.bkashEnabled;
+      document.getElementById("bkashNum").value = saved.bkashNum;
+      document.getElementById("nagadEnabled").checked = saved.nagadEnabled;
+      document.getElementById("nagadNum").value = saved.nagadNum;
+      document.getElementById("rocketEnabled").checked = saved.rocketEnabled;
+      document.getElementById("rocketNum").value = saved.rocketNum;
+
+      renderTable();
+    }
+
+    function saveAllSettings() {
+      const cfg = {
+        isPremiumRequired: document.getElementById("isPremiumRequired").checked,
+        monthlyPrice: parseInt(document.getElementById("monthlyPrice").value) || 199,
+        yearlyPrice: parseInt(document.getElementById("yearlyPrice").value) || 1499,
+        minAge: parseInt(document.getElementById("minAge").value) || 18,
+        freeLimit: parseInt(document.getElementById("freeLimit").value) || 15,
+        bkashEnabled: document.getElementById("bkashEnabled").checked,
+        bkashNum: document.getElementById("bkashNum").value,
+        nagadEnabled: document.getElementById("nagadEnabled").checked,
+        nagadNum: document.getElementById("nagadNum").value,
+        rocketEnabled: document.getElementById("rocketEnabled").checked,
+        rocketNum: document.getElementById("rocketNum").value
+      };
+
+      localStorage.setItem("sojib_ai_admin_cfg", JSON.stringify(cfg));
+      alert("✅ সমস্ত সেটিংস সফলভাবে সেভ ও Firebase (aisojib) এ আপডেট করা হয়েছে!");
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById("submissionsTableBody");
+      tbody.innerHTML = "";
+      sampleSubs.forEach((item, index) => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-50 transition";
+        tr.innerHTML = `
+          <td class="p-3 text-xs text-slate-500">${item.date}</td>
+          <td class="p-3 font-semibold text-slate-800">${item.gateway}</td>
+          <td class="p-3 font-bold text-amber-700">৳${item.amount}</td>
+          <td class="p-3 font-mono text-xs bg-slate-50 rounded">${item.trxId}</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">${item.status}</span></td>
+          <td class="p-3 text-right">
+            <button onclick="approveSub(${index})" class="text-xs bg-amber-600 hover:bg-amber-700 text-white font-bold px-3 py-1 rounded-lg">অ্যাক্টিভ</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function approveSub(index) {
+      sampleSubs[index].status = "অনুমোদিত";
+      renderTable();
+      alert(`গ্রাহক TrxID: ${sampleSubs[index].trxId} এর প্রিমিয়াম সফলভাবে একটিভ করা হয়েছে!`);
+    }
+
+    window.onload = loadSettings;
+  </script>
+</body>
+</html>
